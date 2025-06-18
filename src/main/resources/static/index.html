@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chatbot Demo</title>
+    <style>
+        body {
+          font-family: Arial, sans-serif;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          height: 100vh;
+          background-color: #f0f0f0;
+        }
+        .chat-container {
+          width: 400px;
+          background: white;
+          box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+          border-radius: 10px;
+          display: flex;
+          flex-direction: column;
+          overflow: hidden;
+        }
+        .chat-header {
+          background: #007bff;
+          color: white;
+          padding: 15px;
+          text-align: center;
+          font-weight: bold;
+        }
+        .chat-body {
+          padding: 15px;
+          height: 300px;
+          overflow-y: auto;
+          display: flex;
+          flex-direction: column;
+          gap: 10px;
+        }
+        .chat-input {
+          display: flex;
+          padding: 10px;
+          border-top: 1px solid #ccc;
+        }
+        .chat-input input {
+          flex: 1;
+          padding: 10px;
+          border: 1px solid #ccc;
+          border-radius: 5px;
+        }
+        .chat-input button {
+          margin-left: 10px;
+          padding: 10px 15px;
+          background-color: #007bff;
+          border: none;
+          color: white;
+          border-radius: 5px;
+          cursor: pointer;
+        }
+        .message {
+          padding: 10px;
+          border-radius: 10px;
+          max-width: 80%;
+        }
+        .user {
+          background-color: #dcf8c6;
+          align-self: flex-end;
+        }
+        .bot {
+          background-color: #eee;
+          align-self: flex-start;
+        }
+    </style>
+</head>
+<body>
+<div class="chat-container">
+    <div class="chat-header">AI Chatbot</div>
+    <div class="chat-body" id="chat-body"></div>
+    <div class="chat-input">
+        <input type="text" id="userInput" placeholder="Type your message..." />
+        <button onclick="sendMessage()">Send</button>
+    </div>
+</div>
+
+<script>
+    const sender = "User123"; // Fixed sender name for demo
+
+    function appendMessage(text, type) {
+      const messageDiv = document.createElement("div");
+      messageDiv.className = `message ${type}`;
+      messageDiv.innerText = text;
+      document.getElementById("chat-body").appendChild(messageDiv);
+      messageDiv.scrollIntoView();
+    }
+
+async function sendMessage() {
+  const input = document.getElementById("userInput");
+  const userMessage = input.value.trim();
+  if (!userMessage) return;
+
+  appendMessage(userMessage, "user");
+  input.value = "";
+
+  try {
+    const res = await fetch(`/api/send1?sender=${sender}&message=${encodeURIComponent(userMessage)}`, {
+  method: "POST"
+  });
+
+    const data = await res.json();
+    console.log("RESPONSE: ", data); // optional for debugging
+
+    // ✅ Safely check and fallback
+    const botReply = data.reply || "⚠️ Bot did not send a reply";
+    appendMessage(botReply, "bot");
+  } catch (error) {
+    appendMessage("❌ Error contacting chatbot API", "bot");
+  }
+}
+
+</script>
+</body>
+</html>
